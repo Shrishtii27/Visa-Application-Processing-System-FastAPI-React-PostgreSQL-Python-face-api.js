@@ -27,38 +27,43 @@ cd poc
 
 ## 2. Set Up the Database
 
-Open **pgAdmin** or use `psql` in terminal to create a new database:
+Open terminal and create the database:
 
-```sql
-CREATE DATABASE poc_db;
+```bash
+# On Mac (Homebrew PostgreSQL):
+createdb poc_db
+
+# OR on any system via psql:
+psql -c "CREATE DATABASE poc_db;"
+```
+
+Then enable the pgcrypto extension:
+```bash
+psql -d poc_db -c 'CREATE EXTENSION IF NOT EXISTS "pgcrypto";'
 ```
 
 ---
 
 ## 3. Configure Environment Variables
 
-Go into the `backend/` folder and copy the example `.env` file:
+Copy the example `.env` files and fill in your credentials:
 
 ```bash
-cd backend
-cp .env.example .env
+# Backend
+cp backend/.env.example backend/.env
+
+# Frontend
+cp frontend/.env.example frontend/.env
 ```
 
-Now open `backend/.env` and fill in your database credentials:
+Open `backend/.env` and update your PostgreSQL password:
 
 ```env
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/poc_db
-SECRET_KEY=your-super-secret-key-change-in-production
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
-ENVIRONMENT=development
-UPLOAD_DIR=uploads
-MAX_FILE_SIZE_MB=10
-CERTIFICATE_SECRET=your-certificate-secret-key
+DATABASE_URL=postgresql://YOUR_USERNAME:YOUR_PASSWORD@localhost:5432/poc_db
 ```
 
-> ⚠️ Replace `YOUR_PASSWORD` with your actual PostgreSQL password.  
-> If your PostgreSQL runs on a different port, update `5432` accordingly.
+> ⚠️ On Mac (Homebrew), your username is usually your macOS username with no password.  
+> Example: `DATABASE_URL=postgresql://yourname@localhost:5432/poc_db`
 
 ---
 
@@ -66,6 +71,7 @@ CERTIFICATE_SECRET=your-certificate-secret-key
 
 ```bash
 # From inside the backend/ folder
+cd backend
 python -m venv .venv
 
 # Activate it
@@ -82,10 +88,24 @@ pip install -r requirements.txt
 
 ## 5. Run Database Migrations
 
-This sets up all the tables and seeds the initial data (countries, visa types, etc.):
+Run all SQL migration files to create tables and seed data:
 
 ```bash
-alembic upgrade head
+cd database/migrations
+
+for file in $(ls *.sql | sort); do
+  echo "Running $file..."
+  psql -d poc_db -f "$file"
+done
+```
+
+This will create **9 tables**, **7 enum types**, **26 indexes**, and seed data for countries, visa types, requirements, and form fields.
+
+> 💡 All files use `IF NOT EXISTS` and `ON CONFLICT DO NOTHING`, so you can safely re-run them without breaking anything.
+
+**After pulling new changes**, only run the NEW migration files:
+```bash
+psql -d poc_db -f database/migrations/012_new_file.sql
 ```
 
 ---
