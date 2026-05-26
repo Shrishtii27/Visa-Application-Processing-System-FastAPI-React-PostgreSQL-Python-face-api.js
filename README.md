@@ -1,6 +1,6 @@
-# POC — Visa Application Processing System
+# POC - Visa Application Processing System
 
-A FastAPI backend for processing visa applications with PostgreSQL, SQLAlchemy ORM, and Alembic migrations.
+A FastAPI backend for processing visa and KYC-related applications with PostgreSQL, SQLAlchemy ORM, and Alembic migrations.
 
 ---
 
@@ -23,11 +23,13 @@ git clone https://gitlab.rdprojects.tech/poc/poc.git
 cd poc
 ```
 
+If you already have the repo locally, just open the project folder and continue with the next steps.
+
 ---
 
-## 2. Set Up the Database
+## 2. Create the Database
 
-Open terminal and create the database:
+Open **pgAdmin** or use `psql` in a terminal to create a new database:
 
 ```bash
 # On Mac (Homebrew PostgreSQL):
@@ -46,20 +48,27 @@ psql -d poc_db -c 'CREATE EXTENSION IF NOT EXISTS "pgcrypto";'
 
 ## 3. Configure Environment Variables
 
-Copy the example `.env` files and fill in your credentials:
+The backend configuration lives in `backend/.env`.
 
 ```bash
-# Backend
-cp backend/.env.example backend/.env
+cd backend
+# On Windows
+copy .env.example .env
 
-# Frontend
-cp frontend/.env.example frontend/.env
+# On macOS or Linux
+cp .env.example .env
 ```
 
-Open `backend/.env` and update your PostgreSQL password:
+Now open `backend/.env` and update the values for your local environment:
 
 ```env
-DATABASE_URL=postgresql://YOUR_USERNAME:YOUR_PASSWORD@localhost:5432/poc_db
+DATABASE_URL=postgresql://user:password@localhost:5432/poc_db
+SECRET_KEY=change-this-to-a-random-secret
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+ENVIRONMENT=development
+APP_NAME=POC Visa Application System
+APP_VERSION=1.0.0
 ```
 
 > ⚠️ On Mac (Homebrew), your username is usually your macOS username with no password.  
@@ -69,18 +78,25 @@ DATABASE_URL=postgresql://YOUR_USERNAME:YOUR_PASSWORD@localhost:5432/poc_db
 
 ## 4. Create a Virtual Environment and Install Dependencies
 
-```bash
-# From inside the backend/ folder
-cd backend
-python -m venv .venv
+Run the following commands from inside the `backend/` folder:
 
-# Activate it
-# On Mac/Linux:
-source .venv/bin/activate
-# On Windows:
+```bash
+python -m venv .venv
+```
+
+Activate the virtual environment:
+
+```bash
+# Windows
 .venv\Scripts\activate
 
-# Install all dependencies
+# macOS / Linux
+source .venv/bin/activate
+```
+
+Install the backend dependencies:
+
+```bash
 pip install -r requirements.txt
 ```
 
@@ -88,7 +104,7 @@ pip install -r requirements.txt
 
 ## 5. Run Database Migrations
 
-Run all SQL migration files to create tables and seed data:
+Apply the Alembic migrations to create the database schema:
 
 ```bash
 cd database/migrations
@@ -112,52 +128,71 @@ psql -d poc_db -f database/migrations/012_new_file.sql
 
 ## 6. Start the Server
 
+From the `backend/` directory, run:
+
 ```bash
 uvicorn app.main:app --reload
 ```
 
-The server will be running at: **http://localhost:8000**
+The server will be available at:
+
+- `http://localhost:8000`
 
 ---
 
-## 7. Verify It's Working
+## 7. Verify It Is Working
 
 Open your browser and visit:
-- **http://localhost:8000** — should return `{"status": "online"}`
-- **http://localhost:8000/docs** — interactive API documentation
+
+- `http://localhost:8000` - should return `{"status":"online","message":"Welcome to the POC KYC Verification API"}`
+- `http://localhost:8000/health` - should return `{"status":"healthy"}`
+- `http://localhost:8000/docs` - interactive API documentation
 
 ---
 
 ## Project Structure
 
-```
+```text
 poc/
-├── backend/
-│   ├── alembic/                  # Database migration scripts
-│   │   └── versions/
-│   │       └── 84d2af6f4e72_initial_migration.py
-│   ├── app/
-│   │   ├── core/
-│   │   │   └── database.py       # DB engine, session, migration runner
-│   │   ├── models/               # SQLAlchemy ORM models
-│   │   │   ├── base.py
-│   │   │   ├── enums.py
-│   │   │   ├── user.py
-│   │   │   ├── country.py
-│   │   │   ├── visa_type.py
-│   │   │   ├── requirement.py
-│   │   │   ├── field_config.py
-│   │   │   ├── application.py
-│   │   │   ├── document.py
-│   │   │   ├── audit_log.py
-│   │   │   └── checklist.py
-│   │   └── main.py               # FastAPI app entry point
-│   ├── requirements.txt
-│   ├── alembic.ini
-│   └── .env.example
-├── frontend/
-├── .gitignore
-└── README.md
+backend/
+  alembic/
+    env.py
+    README
+    script.py.mako
+    versions/
+      84d2af6f4e72_initial_migration.py
+  migrations/
+  app/
+    core/
+      database.py
+    models/
+      __init__.py
+      application.py
+      audit_log.py
+      base.py
+      checklist.py
+      country.py
+      document.py
+      enums.py
+      field_config.py
+      requirement.py
+      user.py
+      visa_type.py
+    routers/
+    schemas/
+    services/
+      face/
+      ocr/
+      visa/
+    utils/
+    main.py
+  tests/
+  .env.example
+  alembic.ini
+  requirements.txt
+frontend/
+.gitignore
+README.md
 ```
 
 ---
@@ -168,11 +203,19 @@ poc/
 |--------|---------|
 | `main` | Stable production-ready code |
 | `development` | Active development branch |
-| `your-name-date` | Personal feature branch (e.g. `shrishti25may`) |
+| `your-name-date` | Personal feature branch, for example `shrishti25may` |
 
-Always branch off `development`, never directly from `main`.
+Always branch off `development`, never directly from `main`:
 
 ```bash
 git checkout development
 git checkout -b yourname-date
 ```
+
+---
+
+## Notes
+
+- The backend starts migrations automatically on application startup through `backend/app/main.py`.
+- Upload directories and other file-processing settings are configured through `backend/.env`.
+- If you are adding frontend work later, keep the API running on port `8000` and connect the UI to that base URL.

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   BadgeCheck,
@@ -25,7 +26,7 @@ const stackCards = [
   },
 ];
 
-function Home() {
+export function HomePage() {
   return (
     <main className="bg-[#f4f7fb] text-[#16235f]">
       <section className="relative overflow-hidden">
@@ -58,19 +59,19 @@ function Home() {
               </p>
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <a
-                  href="/register"
+                <Link
+                  to="/register"
                   className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl bg-[#22348f] px-7 text-base font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.25)] transition hover:-translate-y-0.5 hover:bg-[#1b2d7b]"
                 >
                   Start Your Verification
                   <ArrowRight className="h-5 w-5" />
-                </a>
-                <a
-                  href="/login"
+                </Link>
+                <Link
+                  to="/login"
                   className="inline-flex h-14 items-center justify-center rounded-2xl border border-slate-200 bg-white px-7 text-base font-semibold text-[#22348f] shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
                 >
                   Login to Continue
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -130,13 +131,13 @@ function Home() {
               minutes.
             </p>
           </div>
-          <a
-            href="/register"
+          <Link
+            to="/register"
             className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#ff7a3d] px-7 text-base font-semibold text-white shadow-[0_14px_34px_rgba(255,122,61,0.32)] transition hover:-translate-y-0.5 hover:bg-[#ff6a22]"
           >
             Start Your Verification
             <ArrowRight className="h-5 w-5" />
-          </a>
+          </Link>
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm text-slate-500">
@@ -153,5 +154,3 @@ function Home() {
     </main>
   );
 }
-
-export default Home;

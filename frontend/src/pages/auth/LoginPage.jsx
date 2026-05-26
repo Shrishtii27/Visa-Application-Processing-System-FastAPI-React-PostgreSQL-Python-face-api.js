@@ -1,24 +1,29 @@
-import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-function Login() {
+export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
-
     try {
       await login(email, password);
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err.message || "Failed to login");
     } finally {
@@ -129,5 +134,3 @@ function Login() {
     </main>
   );
 }
-
-export default Login;
