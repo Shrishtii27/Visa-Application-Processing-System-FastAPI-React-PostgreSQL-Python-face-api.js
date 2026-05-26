@@ -12,7 +12,7 @@ export function Navbar() {
             <ShieldCheck className="h-5 w-5" />
           </span>
           <span className="text-[1.15rem] font-bold tracking-tight text-[#17246f]">
-            Visa
+            Visa Verification Application
           </span>
         </Link>
 
