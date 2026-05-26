@@ -1,10 +1,42 @@
 import { useState } from "react";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await register({ full_name: fullName, email, password });
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "Failed to register");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f4f7fb] text-[#16235f]">
@@ -30,7 +62,12 @@ function SignUp() {
 
               {/* Form card */}
               <div className="mt-8 rounded-[2rem] border border-slate-200/80 bg-white p-7 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-9">
-                <div className="space-y-5">
+                <form className="space-y-5" onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="rounded-xl bg-red-50 p-4 text-sm text-red-600">
+                      {error}
+                    </div>
+                  )}
                   {/* Full Name */}
                   <div>
                     <label className="mb-1.5 block text-sm font-semibold text-[#18246f]">
@@ -39,6 +76,9 @@ function SignUp() {
                     <input
                       type="text"
                       placeholder="John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
                       className="w-full rounded-xl border border-slate-200 bg-[#f8faff] px-4 py-3 text-sm text-[#18246f] placeholder-slate-400 outline-none transition focus:border-[#22348f] focus:ring-2 focus:ring-[#22348f]/15"
                     />
                   </div>
@@ -51,6 +91,9 @@ function SignUp() {
                     <input
                       type="email"
                       placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
                       className="w-full rounded-xl border border-slate-200 bg-[#f8faff] px-4 py-3 text-sm text-[#18246f] placeholder-slate-400 outline-none transition focus:border-[#22348f] focus:ring-2 focus:ring-[#22348f]/15"
                     />
                   </div>
@@ -64,6 +107,10 @@ function SignUp() {
                       <input
                         type={showPassword ? "text" : "password"}
                         placeholder="Min. 8 characters"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        minLength={6}
                         className="w-full rounded-xl border border-slate-200 bg-[#f8faff] px-4 py-3 pr-11 text-sm text-[#18246f] placeholder-slate-400 outline-none transition focus:border-[#22348f] focus:ring-2 focus:ring-[#22348f]/15"
                       />
                       <button
@@ -89,6 +136,10 @@ function SignUp() {
                       <input
                         type={showConfirm ? "text" : "password"}
                         placeholder="Repeat your password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        minLength={6}
                         className="w-full rounded-xl border border-slate-200 bg-[#f8faff] px-4 py-3 pr-11 text-sm text-[#18246f] placeholder-slate-400 outline-none transition focus:border-[#22348f] focus:ring-2 focus:ring-[#22348f]/15"
                       />
                       <button
@@ -107,13 +158,14 @@ function SignUp() {
 
                   {/* Submit */}
                   <button
-                    type="button"
-                    className="mt-2 inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#22348f] text-base font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.25)] transition hover:-translate-y-0.5 hover:bg-[#1b2d7b]"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="mt-2 inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#22348f] text-base font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.25)] transition hover:-translate-y-0.5 hover:bg-[#1b2d7b] disabled:opacity-70 disabled:hover:translate-y-0"
                   >
-                    Register for Verification
+                    {isSubmitting ? "Registering..." : "Register for Verification"}
                     <ArrowRight className="h-5 w-5" />
                   </button>
-                </div>
+                </form>
 
                 <p className="mt-5 text-center text-sm text-slate-500">
                   Already registered?{" "}

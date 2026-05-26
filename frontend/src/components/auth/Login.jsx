@@ -1,7 +1,31 @@
+import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      await login(email, password);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "Failed to login");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <main className="bg-[#f4f7fb] text-[#16235f]">
       <section className="relative overflow-hidden">
@@ -25,7 +49,12 @@ function Login() {
               </p>
 
               <div className="mt-8 rounded-[2rem] border border-slate-200/80 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
-                <form className="space-y-5">
+                <form className="space-y-5" onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="rounded-xl bg-red-50 p-4 text-sm text-red-600">
+                      {error}
+                    </div>
+                  )}
                   <div>
                     <label
                       htmlFor="email"
@@ -36,6 +65,9 @@ function Login() {
                     <input
                       id="email"
                       type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
                       className="h-14 w-full rounded-2xl border border-slate-200 bg-[#f8fbff] px-5 text-base outline-none transition placeholder:text-slate-400 focus:border-[#22348f] focus:ring-4 focus:ring-[#22348f]/10"
                     />
                   </div>
@@ -50,15 +82,19 @@ function Login() {
                     <input
                       id="password"
                       type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
                       className="h-14 w-full rounded-2xl border border-slate-200 bg-[#f8fbff] px-5 text-base outline-none transition placeholder:text-slate-400 focus:border-[#22348f] focus:ring-4 focus:ring-[#22348f]/10"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#22348f] px-7 text-base font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.25)] transition hover:-translate-y-0.5 hover:bg-[#1b2d7b]"
+                    disabled={isSubmitting}
+                    className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#22348f] px-7 text-base font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.25)] transition hover:-translate-y-0.5 hover:bg-[#1b2d7b] disabled:opacity-70 disabled:hover:translate-y-0"
                   >
-                    Login for Verification
+                    {isSubmitting ? "Logging in..." : "Login for Verification"}
                     <ArrowRight className="h-5 w-5" />
                   </button>
                 </form>
