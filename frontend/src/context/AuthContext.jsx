@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { api } from '../services/api';
+import { api, tokenStorage } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -8,10 +8,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchUser = useCallback(async () => {
+    // Only try if we have a token stored
+    if (!tokenStorage.get()) {
+      setLoading(false);
+      return;
+    }
     try {
       const data = await api.get('/auth/me');
       setUser(data);
     } catch (error) {
+      // Token is invalid or expired — clear it
+      tokenStorage.remove();
       setUser(null);
     } finally {
       setLoading(false);
@@ -23,21 +30,19 @@ export const AuthProvider = ({ children }) => {
   }, [fetchUser]);
 
   const login = async (email, password) => {
-    await api.post('/auth/login', { email, password });
-    await fetchUser();
+    const data = await api.post('/auth/login', { email, password });
+    tokenStorage.set(data.access_token);
+    setUser(data.user);
   };
 
   const register = async (userData) => {
     await api.post('/auth/register', userData);
-    await login(userData.email, userData.password); // auto-login after register
+    // Don't auto-login — user will be redirected to login page
   };
 
-  const logout = async () => {
-    try {
-      await api.post('/auth/logout', {});
-    } finally {
-      setUser(null);
-    }
+  const logout = () => {
+    tokenStorage.remove();
+    setUser(null);
   };
 
   return (

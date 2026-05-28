@@ -1,4 +1,4 @@
-import { ShieldCheck, LogOut, LayoutDashboard } from "lucide-react";
+import { ShieldCheck, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -14,7 +14,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between px-4 sm:px-6">
+      <div className="flex h-[76px] items-center justify-between px-6 sm:px-10 lg:px-16">
         <Link to="/" className="flex items-center gap-3">
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#22348f] text-white shadow-[0_12px_26px_rgba(34,52,143,0.22)]">
             <ShieldCheck className="h-5 w-5" />
@@ -27,15 +27,6 @@ export function Navbar() {
         <div className="flex items-center gap-2 sm:gap-3">
           {user ? (
             <>
-              {pathname !== "/dashboard" && (
-                <Link
-                  to="/dashboard"
-                  className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-[#17246f] transition hover:bg-slate-100"
-                >
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
-                </Link>
-              )}
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"

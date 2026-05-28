@@ -51,11 +51,17 @@ async def health():
     return {"status": "healthy"}
 
 from app.routers.auth import router as auth_router
+from app.routers.countries import router as countries_router
+from app.routers.applications import router as applications_router
+from app.routers.documents import router as documents_router
+from app.routers.bank_statement import router as bank_statement_router
+from app.routers.face import router as face_router
 
 # NOTE: Routers will be registered here one by one
 # as we build them:
 app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
-# app.include_router(countries_router, prefix="/api/countries", tags=["Countries"])
-# app.include_router(applications_router, prefix="/api/applications", tags=["Applications"])
-# app.include_router(documents_router, prefix="/api/applications", tags=["Documents"])
-# app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])
+app.include_router(countries_router, prefix="/api/countries", tags=["Countries"])
+app.include_router(applications_router, prefix="/api/applications", tags=["Applications"])
+app.include_router(documents_router, prefix="/api/applications", tags=["Documents"])
+app.include_router(bank_statement_router, prefix="/api/applications", tags=["Bank Statement"])
+app.include_router(face_router, prefix="/api/applications", tags=["Face Verification"])

@@ -13,7 +13,7 @@ export function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [user, navigate]);
 
@@ -23,7 +23,7 @@ export function LoginPage() {
     setIsSubmitting(true);
     try {
       await login(email, password);
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
       setError(err.message || "Failed to login");
     } finally {
@@ -37,7 +37,7 @@ export function LoginPage() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,122,61,0.10),_transparent_28%),radial-gradient(circle_at_right,_rgba(34,52,143,0.08),_transparent_30%),linear-gradient(180deg,_#f8fbff_0%,_#f4f7fb_100%)]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-slate-200/80" />
 
-        <div className="relative mx-auto max-w-[1280px] px-4 pb-16 pt-10 sm:px-6 lg:pb-20 lg:pt-16">
+        <div className="relative px-6 pb-16 pt-10 sm:px-10 lg:px-16 lg:pb-20 lg:pt-16">
           <div className="grid items-center gap-12 lg:grid-cols-[0.98fr_1.02fr] lg:gap-16">
             <div className="max-w-[660px]">
               <span className="inline-flex items-center gap-2 rounded-full border border-orange-100 bg-white px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#ff7a3d] shadow-sm">

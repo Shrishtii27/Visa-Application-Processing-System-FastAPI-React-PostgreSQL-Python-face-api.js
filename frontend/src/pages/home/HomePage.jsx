@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   ArrowRight,
   BadgeCheck,
@@ -27,13 +28,15 @@ const stackCards = [
 ];
 
 export function HomePage() {
+  const { user } = useAuth();
+
   return (
     <main className="bg-[#f4f7fb] text-[#16235f]">
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,122,61,0.14),_transparent_28%),radial-gradient(circle_at_right,_rgba(34,52,143,0.10),_transparent_30%),linear-gradient(180deg,_#ffffff_0%,_#f4f7fb_72%)]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-slate-200/80" />
 
-        <div className="relative mx-auto max-w-[1280px] px-4 pb-16 pt-10 sm:px-6 lg:pb-24 lg:pt-16">
+        <div className="relative px-6 pb-16 pt-10 sm:px-10 lg:px-16 lg:pb-24 lg:pt-16">
           <div className="grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16">
             <div className="max-w-[640px]">
               <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[#243a88] shadow-sm">
@@ -42,14 +45,15 @@ export function HomePage() {
               </span>
 
               <h1 className="mt-6 text-5xl font-extrabold leading-[0.95] tracking-tight text-[#18246f] sm:text-6xl lg:text-[4.5rem]">
-                <span className="block">Secure Passport</span>
-                <span className="block text-[#ff7a3d]">Verification</span>
-                <span className="block">System for Global Identity</span>
+                <span className="block">{user ? `Welcome, ${user.full_name || 'User'}!` : "Secure Passport"}</span>
+                <span className="block text-[#ff7a3d]">{user ? "Ready to Verify?" : "Verification"}</span>
+                <span className="block">{user ? "" : "System for Global Identity"}</span>
               </h1>
 
               <p className="mt-6 max-w-[630px] text-lg leading-8 text-slate-600 sm:text-xl">
-                Verify your identity using advanced passport scanning, document
-                validation, and facial recognition technology.
+                {user 
+                  ? "You are logged in and ready to begin your secure passport verification journey."
+                  : "Verify your identity using advanced passport scanning, document validation, and facial recognition technology."}
               </p>
 
               <p className="mt-4 max-w-[620px] text-base leading-7 text-slate-600 sm:text-lg">
@@ -60,18 +64,27 @@ export function HomePage() {
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Link
-                  to="/register"
+                  to={user ? "/welcome" : "/register"}
                   className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl bg-[#22348f] px-7 text-base font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.25)] transition hover:-translate-y-0.5 hover:bg-[#1b2d7b]"
                 >
-                  Start Your Verification
+                  {user ? "Continue Verification" : "Start Your Verification"}
                   <ArrowRight className="h-5 w-5" />
                 </Link>
-                <Link
-                  to="/login"
-                  className="inline-flex h-14 items-center justify-center rounded-2xl border border-slate-200 bg-white px-7 text-base font-semibold text-[#22348f] shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
-                >
-                  Login to Continue
-                </Link>
+                {user ? (
+                  <Link
+                    to="/history"
+                    className="inline-flex h-14 items-center justify-center rounded-2xl border border-slate-200 bg-white px-7 text-base font-semibold text-[#22348f] shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                  >
+                    View History
+                  </Link>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="inline-flex h-14 items-center justify-center rounded-2xl border border-slate-200 bg-white px-7 text-base font-semibold text-[#22348f] shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                  >
+                    Login to Continue
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -91,7 +104,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1280px] px-4 pb-14 sm:px-6 lg:pb-20">
+      <section className="px-6 pb-14 sm:px-10 lg:px-16 lg:pb-20">
         <div className="text-center">
           <span className="inline-flex items-center rounded-full bg-[#ff7a3d]/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#ff7a3d]">
             Verification Stack

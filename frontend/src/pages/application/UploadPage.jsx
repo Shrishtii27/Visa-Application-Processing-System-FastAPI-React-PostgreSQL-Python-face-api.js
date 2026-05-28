@@ -4,11 +4,16 @@ import { Loader2, Upload } from "lucide-react";
 import { SplitLayout } from "../../components/shared/SplitLayout";
 import { StepProgress } from "../../components/shared/StepProgress";
 
+import { api } from "../../services/api";
+import { useApplication } from "../../context/ApplicationContext";
+
 export function UploadPage() {
   const navigate = useNavigate();
+  const { applicationId } = useApplication();
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [scanning, setScanning] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     return () => {
@@ -22,24 +27,51 @@ export function UploadPage() {
     if (!pickedFile) return;
     setFile(pickedFile);
     setPreview(URL.createObjectURL(pickedFile));
+    setError(null);
   };
 
-  const scan = () => {
+  const scan = async () => {
+    if (!applicationId) {
+      setError("Application session missing. Please start over.");
+      return;
+    }
     setScanning(true);
-    setTimeout(() => navigate("/scan-result"), 1800);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // 1. Upload passport
+      await api.fetch(`/applications/${applicationId}/documents/passport`, {
+        method: "POST",
+        body: formData,
+      });
+
+      // 2. Trigger scan
+      await api.post(`/applications/${applicationId}/passport/scan`, {});
+
+      navigate("/scan-result");
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to scan passport.");
+    } finally {
+      setScanning(false);
+    }
   };
+
 
   return (
     <>
       <StepProgress current={2} />
       <SplitLayout
-        image="/assets/passport-closeup.jpg"
-        imageAlt="Passport close-up"
+        image="/assets/indian-passport-closeup.png"
+        imageAlt="Indian Passport scan"
         eyebrow="Step 2"
         title="Upload Your Passport"
         subtitle="We'll scan and extract data automatically."
       >
         <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+          {error && <div className="text-sm text-red-500">{error}</div>}
           <label
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
@@ -72,20 +104,29 @@ export function UploadPage() {
             </div>
           )}
 
-          <button
-            disabled={!file || scanning}
-            onClick={scan}
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#ff7a3d] text-sm font-semibold text-white shadow-[0_14px_35px_rgba(255,122,61,0.24)] transition hover:bg-[#ff6a22] disabled:opacity-50"
-          >
-            {scanning ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Scanning passport for verification...
-              </>
-            ) : (
-              "Scan Passport"
-            )}
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              disabled={scanning}
+              className="flex h-11 w-1/3 items-center justify-center rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+            >
+              Back
+            </button>
+            <button
+              disabled={!file || scanning}
+              onClick={scan}
+              className="flex h-11 w-2/3 items-center justify-center gap-2 rounded-xl bg-[#ff7a3d] text-sm font-semibold text-white shadow-[0_14px_35px_rgba(255,122,61,0.24)] transition hover:bg-[#ff6a22] disabled:opacity-50"
+            >
+              {scanning ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Scanning...
+                </>
+              ) : (
+                "Scan Passport"
+              )}
+            </button>
+          </div>
         </div>
       </SplitLayout>
     </>

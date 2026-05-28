@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { register, user } = useAuth();
+  const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -15,11 +15,6 @@ export function RegisterPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,8 +24,8 @@ export function RegisterPage() {
     setError("");
     setIsSubmitting(true);
     try {
-      await register(email, password, fullName);
-      navigate("/dashboard", { replace: true });
+      await register({ email, password, full_name: fullName });
+      navigate("/login", { replace: true });
     } catch (err) {
       setError(err.message || "Failed to create an account");
     } finally {
@@ -40,7 +35,7 @@ export function RegisterPage() {
 
   return (
     <main className="bg-[#f4f7fb] text-[#16235f]">
-      <section className="mx-auto max-w-[1280px] px-4 py-14 sm:px-6 lg:py-20">
+      <section className="px-6 py-14 sm:px-10 lg:px-16 lg:py-20">
         <div className="grid items-stretch gap-10 lg:grid-cols-2 lg:gap-14">
           <div className="flex flex-col justify-center">
             <span className="inline-flex w-fit rounded-full bg-[#ff7a3d]/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#ff7a3d]">

@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import { SiteLayout } from "./components/shared/SiteLayout";
 import { HomePage } from "./pages/home/HomePage";
 import { LoginPage } from "./pages/auth/LoginPage";
@@ -12,13 +12,13 @@ import { DocumentsPage } from "./pages/application/DocumentsPage";
 import { CameraPage } from "./pages/application/CameraPage";
 import { FaceResultPage } from "./pages/application/FaceResultPage";
 import { ResultPage } from "./pages/application/ResultPage";
-import Dashboard from "./components/dashboard/Dashboard";
+import { HistoryPage } from "./pages/application/HistoryPage";
 import { AuthProvider } from "./context/AuthContext";
-import { ProtectedRoute } from "./components/shared/ProtectedRoute";
+import { ApplicationProvider } from "./context/ApplicationContext";
 
 function NotFoundPage() {
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-152px)] max-w-2xl items-center justify-center px-4 py-16 text-center">
+    <div className="flex min-h-[calc(100vh-152px)] items-center justify-center px-6 py-16 text-center sm:px-10 lg:px-16">
       <div>
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#ff7a3d]">
           404
@@ -46,46 +46,32 @@ function NavigateButton() {
   );
 }
 
-function DashboardPage() {
-  return (
-    <>
-      <Navbar />
-      <Dashboard />
-      <Footer />
-    </>
-  );
-}
 
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<SiteLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/welcome" element={<WelcomePage />} />
-            <Route path="/country" element={<CountryPage />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/scan-result" element={<ScanResultPage />} />
-            <Route path="/verify-form" element={<VerifyFormPage />} />
-            <Route path="/documents" element={<DocumentsPage />} />
-            <Route path="/camera" element={<CameraPage />} />
-            <Route path="/face-result" element={<FaceResultPage />} />
-            <Route path="/result" element={<ResultPage />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <ApplicationProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<SiteLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/welcome" element={<WelcomePage />} />
+              <Route path="/country" element={<CountryPage />} />
+              <Route path="/upload" element={<UploadPage />} />
+              <Route path="/scan-result" element={<ScanResultPage />} />
+              <Route path="/verify-form" element={<VerifyFormPage />} />
+              <Route path="/documents" element={<DocumentsPage />} />
+              <Route path="/camera" element={<CameraPage />} />
+              <Route path="/face-result" element={<FaceResultPage />} />
+              <Route path="/result" element={<ResultPage />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </ApplicationProvider>
     </AuthProvider>
   );
 }
