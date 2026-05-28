@@ -252,7 +252,17 @@ def perform_mrz_scan(image_path: str) -> Dict[str, Any]:
             # Line 2: passport_number (0-9), dob (13-18), sex (20), expiry (21-26), nationality (28-31)
             parsed_fields["passport_number"] = line2[0:9].replace("<", "")
             parsed_fields["date_of_birth"] = parse_mrz_date(line2[13:19])
-            parsed_fields["sex"] = line2[20] if line2[20] in ["M", "F", "X"] else ""
+            parsed_fields["sex"] = ""
+            for char in line2[18:23]:
+                if char in ["M", "F", "X"]:
+                    parsed_fields["sex"] = char
+                    break
+                elif char in ["H", "N"]:
+                    parsed_fields["sex"] = "M"
+                    break
+                elif char == "W":
+                    parsed_fields["sex"] = "F"
+                    break
             parsed_fields["expiry_date"] = parse_mrz_date(line2[21:27])
             parsed_fields["nationality"] = line2[28:31].replace("<", "")
         except Exception as e:
@@ -300,18 +310,45 @@ def perform_mrz_scan(image_path: str) -> Dict[str, Any]:
             # Heuristic for names: Look for lines after keywords
             for i, line in enumerate(lines):
                 line_up = line.upper()
-                if ("SURNAME" in line_up or "LAST NAME" in line_up) and i + 1 < len(lines):
+                if ("SURNAME" in line_up or "LAST NAME" in line_up):
                     if not parsed_fields["surname"]:
-                        parsed_fields["surname"] = lines[i+1].replace("<", "").strip()
-                elif ("GIVEN" in line_up or "FIRST NAME" in line_up) and i + 1 < len(lines):
+                        # Might be on same line after a colon, or next line
+                        if ":" in line_up and len(line_up.split(":")) > 1 and len(line_up.split(":")[1].strip()) > 1:
+                            parsed_fields["surname"] = line_up.split(":")[1].replace("<", "").strip()
+                        elif i + 1 < len(lines):
+                            parsed_fields["surname"] = lines[i+1].replace("<", "").strip()
+                            
+                elif ("GIVEN" in line_up or "FIRST NAME" in line_up):
                     if not parsed_fields["given_names"]:
-                        parsed_fields["given_names"] = lines[i+1].replace("<", "").strip()
-                elif "NATIONALITY" in line_up and i + 1 < len(lines):
+                        if ":" in line_up and len(line_up.split(":")) > 1 and len(line_up.split(":")[1].strip()) > 1:
+                            parsed_fields["given_names"] = line_up.split(":")[1].replace("<", "").strip()
+                        elif i + 1 < len(lines):
+                            parsed_fields["given_names"] = lines[i+1].replace("<", "").strip()
+                            
+                elif "NATIONALITY" in line_up:
                     if not parsed_fields["nationality"]:
-                        parsed_fields["nationality"] = lines[i+1][:3]
-                elif "SEX" in line_up and i + 1 < len(lines):
+                        if ":" in line_up and len(line_up.split(":")) > 1 and len(line_up.split(":")[1].strip()) > 1:
+                            parsed_fields["nationality"] = line_up.split(":")[1][:3]
+                        elif i + 1 < len(lines):
+                            parsed_fields["nationality"] = lines[i+1][:3]
+                            
+                elif "SEX" in line_up or "GENDER" in line_up:
                     if not parsed_fields["sex"]:
-                        parsed_fields["sex"] = "F" if "F" in lines[i+1].upper() else "M"
+                        # Check same line first: "Sex: F" or "Sex F"
+                        if " F " in " " + line_up + " " or line_up.endswith(" F") or line_up.endswith(":F"):
+                            parsed_fields["sex"] = "F"
+                        elif " M " in " " + line_up + " " or line_up.endswith(" M") or line_up.endswith(":M"):
+                            parsed_fields["sex"] = "M"
+                        elif i + 1 < len(lines):
+                            parsed_fields["sex"] = "F" if "F" in lines[i+1].upper() else "M"
+                            
+            if not parsed_fields["sex"]:
+                # Specific regex fallback for structured gender fields
+                import re
+                gender_match = re.search(r'(?i)(?:sex|gender)\s*:?\s*(m|f|male|female|x)\b', full_text)
+                if gender_match:
+                    val = gender_match.group(1).upper()
+                    parsed_fields["sex"] = "M" if val.startswith("M") else "F" if val.startswith("F") else "X"
                         
             # If we STILL have nothing (completely unstructured AI image), just take top text
             if not parsed_fields["surname"] and len(lines) > 2:
