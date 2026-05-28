@@ -344,7 +344,7 @@ export function CameraPage() {
           <h2 className="text-xl font-bold text-red-700">Verification Failed</h2>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-left">
             <p className="text-red-700 text-xs font-medium mb-0.5">Reason:</p>
-            <p className="text-red-600 text-sm">{result.reason || result.message}</p>
+            <p className="text-red-600 text-sm">Face not matched</p>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div
@@ -371,15 +371,9 @@ export function CameraPage() {
               onClick={handleRetry}
               className="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition"
             >
-              Try Again ({3 - result.retry_count} attempts left)
+              Try Again
             </button>
-          ) : (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <p className="text-yellow-800 text-xs">
-                Maximum attempts reached. Please contact support.
-              </p>
-            </div>
-          )}
+          ) : null}
 
           <button
             onClick={() => window.location.href = "mailto:support@visapoc.com"}

@@ -169,13 +169,8 @@ async def submit_face_result(
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
 
-    # Check retry count (max 3 attempts)
+    # Get retry count for logging
     retry_count = await face_service.get_retry_count(id, db)
-    if retry_count >= face_service.MAX_RETRIES:
-        raise HTTPException(
-            status_code=429,
-            detail="Maximum face verification attempts reached. Please contact support.",
-        )
 
     try:
         # Save selfie image
@@ -202,7 +197,7 @@ async def submit_face_result(
             reason = None
         else:
             final_status = 'rejected'
-            can_retry = retry_count < 3
+            can_retry = True
 
             # Specific rejection reason
             if not request.liveness_passed:

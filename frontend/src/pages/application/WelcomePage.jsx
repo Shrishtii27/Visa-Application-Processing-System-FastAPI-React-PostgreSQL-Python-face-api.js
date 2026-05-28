@@ -112,12 +112,6 @@ export function WelcomePage() {
                 >
                   <ShieldCheck className="h-4 w-4 transition-transform group-hover:scale-110" /> Yes, Verify Passport
                 </button>
-                <button
-                  onClick={() => navigate("/country")}
-                  className="group flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-semibold text-[#18246f] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#22348f]/30 hover:bg-slate-50 hover:shadow-md"
-                >
-                  <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" /> No, Apply for New Verification
-                </button>
               </div>
             </div>
           </div>
