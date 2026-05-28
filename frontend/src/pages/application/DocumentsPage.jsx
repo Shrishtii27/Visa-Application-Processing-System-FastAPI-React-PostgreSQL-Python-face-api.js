@@ -196,7 +196,7 @@ export function DocumentsPage() {
     <>
       <StepProgress current={5} />
       <SplitLayout
-        image="/assets/documents.jpg"
+        image="/assets/indian-passport-closeup.png"
         imageAlt="Document verification"
         eyebrow="Step 5"
         title="Upload Supporting Documents"

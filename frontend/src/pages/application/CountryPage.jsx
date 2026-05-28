@@ -5,6 +5,7 @@ import { StepProgress } from "../../components/shared/StepProgress";
 import { CustomSelect } from "../../components/shared/CustomSelect";
 import { api } from "../../services/api";
 import { useApplication } from "../../context/ApplicationContext";
+import { Briefcase, Plane, GraduationCap, MapPin, Loader2, ArrowRight } from "lucide-react";
 
 export function CountryPage() {
   const navigate = useNavigate();
@@ -99,8 +100,8 @@ export function CountryPage() {
     <>
       <StepProgress current={1} />
       <SplitLayout
-        image="/assets/globe-passport.jpg"
-        imageAlt="Globe with passport"
+        image="/assets/ai_globe_travel.png"
+        imageAlt="Global futuristic travel network"
         eyebrow="Step 1"
         title="Country & Purpose"
         subtitle="Tell us where and why you need verification."
@@ -131,41 +132,79 @@ export function CountryPage() {
                 <div className="text-sm text-slate-500">No visa options available for this country.</div>
               ) : (
                 <div className="grid gap-3">
-                  {visaTypes.map((visa) => (
+                  {visaTypes.map((visa) => {
+                    const isSelected = selectedVisaId === visa.id;
+                    const nameLower = visa.visa_name.toLowerCase();
+                    const Icon = nameLower.includes("business") || nameLower.includes("work") ? Briefcase 
+                                : nameLower.includes("student") || nameLower.includes("study") ? GraduationCap 
+                                : Plane;
+                    
+                    return (
                     <button
                       key={visa.id}
                       onClick={() => setSelectedVisaId(visa.id)}
                       className={[
-                        "rounded-xl border p-4 text-left transition",
-                        selectedVisaId === visa.id
-                          ? "border-[#ff7a3d] bg-[#ff7a3d]/5 shadow-[0_12px_28px_rgba(15,23,42,0.06)]"
-                          : "border-slate-200 bg-white hover:border-[#ff7a3d]/50",
+                        "group relative flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all duration-200",
+                        isSelected
+                          ? "border-[#22348f] bg-gradient-to-r from-blue-50 to-[#f8f9ff] shadow-md shadow-blue-900/5 ring-1 ring-[#22348f]/10"
+                          : "border-slate-200 bg-white hover:border-[#ff7a3d]/40 hover:bg-slate-50 hover:shadow-sm",
                       ].join(" ")}
                     >
-                      <div className="font-semibold text-[#18246f]">{visa.visa_name}</div>
-                      <div className="mt-1 text-xs text-slate-500 line-clamp-2" title={visa.description}>
-                        {visa.description || "No description available"}
+                      <div className={[
+                        "flex shrink-0 items-center justify-center rounded-lg p-2.5 transition-colors",
+                        isSelected ? "bg-[#22348f] text-white" : "bg-slate-100 text-slate-500 group-hover:bg-[#ff7a3d]/10 group-hover:text-[#ff7a3d]"
+                      ].join(" ")}>
+                        <Icon className="h-5 w-5" />
                       </div>
+                      <div className="flex-1 pr-6">
+                        <div className={[
+                          "font-bold transition-colors", 
+                          isSelected ? "text-[#18246f]" : "text-slate-700"
+                        ].join(" ")}>{visa.visa_name}</div>
+                        <div className="mt-1 text-xs text-slate-500 line-clamp-2 leading-relaxed" title={visa.description}>
+                          {visa.description || "Select this purpose for your application."}
+                        </div>
+                      </div>
+                      
+                      {isSelected && (
+                         <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#22348f]">
+                             <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                             </svg>
+                           </div>
+                         </div>
+                      )}
                     </button>
-                  ))}
+                  )})}
                 </div>
               )}
             </div>
           )}
 
-          <div className="flex gap-3 mt-6">
+          <div className="flex gap-3 mt-8 border-t border-slate-100 pt-6">
             <button
               onClick={() => navigate(-1)}
-              className="flex h-11 w-1/3 items-center justify-center rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              className="flex h-12 w-1/3 items-center justify-center rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:border-slate-300"
             >
               Back
             </button>
             <button
               disabled={!selectedCountry || !selectedVisaId || isSubmitting}
               onClick={handleContinue}
-              className="flex h-11 w-2/3 items-center justify-center rounded-xl bg-[#22348f] text-sm font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.2)] transition hover:bg-[#1b2d7b] disabled:opacity-50"
+              className="group flex h-12 w-2/3 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#22348f] to-[#18246f] text-sm font-semibold text-white shadow-md shadow-blue-900/20 transition hover:from-[#1b2d7b] hover:to-[#121b54] disabled:opacity-50"
             >
-              {isSubmitting ? "Loading..." : "Continue"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  Continue
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
             </button>
           </div>
         </div>
