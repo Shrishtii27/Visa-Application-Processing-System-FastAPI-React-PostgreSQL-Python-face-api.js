@@ -114,33 +114,6 @@ export function ResultPage() {
     ? "Verified" 
     : "Pending";
 
-  const handleDownload = async () => {
-    try {
-      const token = localStorage.getItem("access_token");
-      const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
-      const response = await fetch(`${API_BASE}/applications/${applicationId}/summary-pdf`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to download PDF");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `POC_Visa_Summary_${applicationId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
-      alert("Error downloading summary PDF");
-    }
-  };
-
   return (
     <>
       <StepProgress current={8} />
@@ -187,7 +160,7 @@ export function ResultPage() {
                 </div>
                 <div className="relative h-3 overflow-hidden rounded-full bg-slate-200/80">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#ff7a3d] to-[#22348f] transition-[width] duration-1000 ease-out"
+                    className="h-full rounded-full bg-gradient-to-r from-red-500 to-green-500 transition-[width] duration-1000 ease-out"
                     style={{ width: `${scorePercent}%` }}
                   />
                   {/* Threshold markers */}
@@ -238,30 +211,23 @@ export function ResultPage() {
             ))}
           </dl>
 
-          {status === "approved" ? (
-            <div className="pt-2 border-t border-slate-200 flex flex-col gap-3">
-              <button
-                onClick={handleDownload}
-                className="block w-full rounded-xl bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.2)] transition hover:bg-green-700"
-              >
-                Download Verification Summary
-              </button>
-              <Link
-                to="/"
-                className="block rounded-xl bg-[#22348f] px-4 py-3 text-center text-sm font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.2)] transition hover:bg-[#1b2d7b]"
-              >
-                Back to Home
-              </Link>
-            </div>
-          ) : (
+          <div className="pt-2 border-t border-slate-200 flex flex-col gap-3">
+            {status === "approved" ? (
+              <div className="block w-full rounded-xl bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.2)]">
+                Approved
+              </div>
+            ) : status === "rejected" ? (
+              <div className="block w-full rounded-xl bg-red-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.2)]">
+                Rejected
+              </div>
+            ) : null}
             <Link
               to="/"
               className="block rounded-xl bg-[#22348f] px-4 py-3 text-center text-sm font-semibold text-white shadow-[0_14px_35px_rgba(34,52,143,0.2)] transition hover:bg-[#1b2d7b]"
             >
-
               Back to Home
             </Link>
-          )}
+          </div>
         </div>
       </SplitLayout>
     </>
