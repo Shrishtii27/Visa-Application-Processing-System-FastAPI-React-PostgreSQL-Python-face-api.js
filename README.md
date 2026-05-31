@@ -19,8 +19,8 @@ Make sure the following are installed on your system:
 ## 1. Clone the Repository
 
 ```bash
-git clone https://gitlab.rdprojects.tech/poc/poc.git
-cd poc
+git clone https://github.com/Shrishtii27/Visa-Application-Processing-System-FastAPI-React-PostgreSQL-Python-face-api.js.git
+cd Visa-Application-Processing-System-FastAPI-React-PostgreSQL-Python-face-api.js
 ```
 
 If you already have the repo locally, just open the project folder and continue with the next steps.
