@@ -3,7 +3,6 @@ import enum
 class UserRole(str, enum.Enum):
     user = 'user'
     admin = 'admin'
-    reviewer = 'reviewer'
 
 class ApplicationStatus(str, enum.Enum):
     draft = 'draft'
@@ -11,7 +10,6 @@ class ApplicationStatus(str, enum.Enum):
     under_review = 'under_review'
     approved = 'approved'
     rejected = 'rejected'
-    manual_review = 'manual_review'
 
 class ApplicationStep(str, enum.Enum):
     country_selection = 'country_selection'
@@ -28,6 +26,14 @@ class VisaPurpose(str, enum.Enum):
     student = 'student'
     family = 'family'
     transit = 'transit'
+    work = 'work'
+    medical = 'medical'
+    spouse_dependent = 'spouse_dependent'
+    immigrant_pr = 'immigrant_pr'
+    diplomatic = 'diplomatic'
+    working_holiday = 'working_holiday'
+    journalist = 'journalist'
+    religious = 'religious'
 
 class DocumentStatus(str, enum.Enum):
     pending = 'pending'

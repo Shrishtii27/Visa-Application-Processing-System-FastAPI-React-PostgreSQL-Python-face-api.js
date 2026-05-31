@@ -1,16 +1,43 @@
+# Environment files — NEVER commit these
 .env
 *.env
+!*.env.example
+
+# Python
 __pycache__/
 *.pyc
-node_modules/
-dist/
-uploads/
-*.egg-info/
-.venv/
-venv/
-vendor/
-composer.lock
-.DS_Store
 *.pyo
 *.pyd
-alembic/versions/__pycache__/
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+.next/
+
+# Uploads — never commit user files
+backend/uploads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# PHP Composer dependencies
+vendor/

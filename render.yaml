@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: poc-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: poc-db
+          property: connectionURI
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 1440
+      - key: ENVIRONMENT
+        value: production
+      - key: APP_NAME
+        value: POC Visa Application System
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: TESSERACT_PATH
+        value: /usr/bin/tesseract
+      - key: ALLOWED_ORIGINS
+        value: https://your-frontend.vercel.app
+
+databases:
+  - name: poc-db
+    plan: free

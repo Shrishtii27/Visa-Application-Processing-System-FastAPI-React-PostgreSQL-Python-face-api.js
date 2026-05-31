@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import String, Integer, Numeric, Boolean, ForeignKey, Enum
+from sqlalchemy import String, Integer, Numeric, Boolean, ForeignKey, Enum, Text, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base
 from app.models.enums import VisaPurpose
@@ -17,3 +17,8 @@ class VisaType(Base):
     fee_usd: Mapped[float | None] = mapped_column(Numeric(10, 2))
     processing_time_days: Mapped[int | None] = mapped_column(Integer)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    __table_args__ = (
+        CheckConstraint("length(description) <= 2000", name="ck_visa_description_length"),
+    )
