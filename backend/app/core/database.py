@@ -19,11 +19,11 @@ backend_dir = current_dir.parent.parent
 # Check backend/.env
 backend_env = backend_dir / ".env"
 if backend_env.exists():
-    load_dotenv(backend_env)
+    load_dotenv(backend_env, override=True)
 # Check root .env
 root_env = backend_dir.parent / ".env"
 if root_env.exists():
-    load_dotenv(root_env)
+    load_dotenv(root_env, override=True)
 
 database_url = os.getenv("DATABASE_URL")
 if database_url:

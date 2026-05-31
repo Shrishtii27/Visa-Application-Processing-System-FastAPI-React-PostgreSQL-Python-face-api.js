@@ -11,8 +11,8 @@ class Application(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True, nullable=False)
-    visa_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('visa_types.id', ondelete='CASCADE'), index=True, nullable=False)
-    applicant_nationality: Mapped[str] = mapped_column(String(3), nullable=False)
+    visa_type_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey('visa_types.id', ondelete='CASCADE'), index=True, nullable=True)
+    applicant_nationality: Mapped[str | None] = mapped_column(String(3), nullable=True)
     step: Mapped[ApplicationStep] = mapped_column(Enum(ApplicationStep, name="application_step"), default=ApplicationStep.country_selection, nullable=False)
     status: Mapped[ApplicationStatus] = mapped_column(Enum(ApplicationStatus, name="application_status"), default=ApplicationStatus.draft, index=True, nullable=False)
     form_data: Mapped[dict | list] = mapped_column(JSONB, default=dict, nullable=False)
